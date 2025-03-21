@@ -1,26 +1,57 @@
-import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import TodoList from "./component/TodoList";
+import TodoFilter from "./component/TodoFilter";
+import AddTodo from "./component/AddTodo";
+import {useState} from "react";
+import {Todo} from "./type";
 
-function App() {
+export default function Home() {
+  const [todos, setTodos] = useState<Todo[]>([])
+  const [filter, setFilter] =useState('all')
+  const addTodo = (text: string) => {
+    const newTodo = {
+      id: Date.now(),
+      text,
+      completed: false
+    }
+    setTodos([...todos, newTodo])
+  }
+
+  const deleteTodo = (id: number) => {
+    setTodos(todos.filter(todo => todo.id !== id));
+  };
+
+  const toggleTodo = (id: number) => {
+    setTodos(todos.map(todo => {
+      if (todo.id === id) {
+        todo.completed = !todo.completed;
+      }
+      return todo;
+    }));
+  };
+
+  const getFilteredTodos = () => {
+    switch (filter) {
+      case 'all':
+        return todos;
+      case 'completed':
+        return todos.filter(todo => todo.completed);
+      case 'active':
+        return todos.filter(todo => !todo.completed);
+      default:
+        return todos;
+    }
+  };
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <div>
+        <h1>MyTodoList</h1>
+        <AddTodo addTodo={addTodo}></AddTodo>
+        <TodoList deleteTodo={deleteTodo} toggleTodo={toggleTodo} todos={getFilteredTodos()}></TodoList>
+        <TodoFilter setFilter={setFilter}></TodoFilter>
+      </div>
   );
 }
 
-export default App;
